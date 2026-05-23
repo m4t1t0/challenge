@@ -35,11 +35,7 @@ return RectorConfig::configure()
     ->withSkip([
         __DIR__ . '/config/',
         __DIR__ . '/public/',
-        __DIR__ . '/tests/Support/_generated',
         __DIR__ . '/tests/bootstrap.php',
-        __DIR__ . '/tests/Support/AcceptanceTester.php',
-        __DIR__ . '/tests/Support/FunctionalTester.php',
-        __DIR__ . '/tests/Support/UnitTester.php',
         __DIR__ . '/src/Kernel.php',
         __DIR__ . '/ecs.php',
         __DIR__ . '/rector.php',

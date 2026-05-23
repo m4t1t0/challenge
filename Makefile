@@ -106,18 +106,15 @@ rector-fix: ## Run Rector and fix errors
 
 TEST_FILTER :=
 
-.PHONY: codecept-build
-codecept-build: ## Codeception build command
-	docker compose exec $(CONTAINER_APP_NAME) php vendor/bin/codecept build
-
 .PHONY: test
-test: unit-test func-test ## Execute all tests
+test: ## Execute all tests
+	docker compose exec $(CONTAINER_APP_NAME) php vendor/bin/phpunit --testdox $(TEST_FILTER)
 
 .PHONY: unit-test
 unit-test: ## Execute unit tests
-	docker compose exec $(CONTAINER_APP_NAME) php vendor/bin/phpunit --testdox
+	docker compose exec $(CONTAINER_APP_NAME) php vendor/bin/phpunit --testsuite=unit --testdox $(TEST_FILTER)
 
 .PHONY: func-test
 func-test: ## Execute functional tests
-	docker compose exec $(CONTAINER_APP_NAME) php vendor/bin/codecept run Functional $(TEST_FILTER)
+	docker compose exec $(CONTAINER_APP_NAME) php vendor/bin/phpunit --testsuite=functional --testdox $(TEST_FILTER)
 
