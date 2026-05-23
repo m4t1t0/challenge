@@ -13,7 +13,9 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-#[AsCommand(name: 'app:example')]
+#[AsCommand(name: 'app:example', help: <<<'TXT'
+This command is a base command for future implementations.
+TXT)]
 final class ExampleCommand extends Command
 {
     public function __construct(
@@ -27,7 +29,6 @@ final class ExampleCommand extends Command
     {
         $this
             ->setDescription('Example command.')
-            ->setHelp('This command is a base command for future implementations.')
         ;
     }
 

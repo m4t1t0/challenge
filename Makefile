@@ -6,8 +6,8 @@ COLOR_BOLD = \033[1m
 
 CONTAINER_APP_NAME = php
 
-PROJECT_NAME = Frankentest
-PROJECT_DESCRIPTION = Frankentest
+PROJECT_NAME = Challenge
+PROJECT_DESCRIPTION = Challenge
 
 SHELL := /bin/bash
 CWD := $(shell cd -P -- '$(shell dirname -- "$0")' && pwd -P)

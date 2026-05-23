@@ -10,7 +10,6 @@ use App\Shared\Application\Bus\CommandBusInterface;
 use App\Shared\Application\Bus\QueryBusInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -23,7 +22,7 @@ final readonly class ExamplePort
         private QueryBusInterface $queryBus,
     ) {}
 
-    public function __invoke(): Response
+    public function __invoke(): JsonResponse
     {
         $this->commandBus->handle(new ExampleCommand());
         $message = $this->queryBus->ask(new ExampleQuery())->getResult();

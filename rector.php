@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
-use Rector\Strict\Rector\Ternary\DisallowedShortTernaryRuleFixerRector;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -26,7 +25,6 @@ return RectorConfig::configure()
         privatization: true,
         instanceOf: true,
         earlyReturn: true,
-        strictBooleans: true,
         rectorPreset: true,
         phpunitCodeQuality: true,
         doctrineCodeQuality: true,
@@ -35,7 +33,6 @@ return RectorConfig::configure()
     )
     ->withRules([])
     ->withSkip([
-        DisallowedShortTernaryRuleFixerRector::class,
         __DIR__ . '/config/',
         __DIR__ . '/public/',
         __DIR__ . '/tests/Support/_generated',
