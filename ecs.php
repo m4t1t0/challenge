@@ -2,7 +2,8 @@
 
 declare(strict_types=1);
 
-use MikelGoig\EasyCodingStandard\SetList as CodingStandard;
+use PhpCsFixer\Fixer\PhpUnit\PhpUnitMethodCasingFixer;
+use PhpCsFixer\Fixer\Strict\DeclareStrictTypesFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
 
 return ECSConfig::configure()
@@ -14,16 +15,19 @@ return ECSConfig::configure()
         __DIR__ . '/tests',
     ])
     ->withRootFiles()
-    ->withSets([CodingStandard::DEFAULT, CodingStandard::RISKY])
+    ->withPhpCsFixerSets(
+        symfony: true,
+        symfonyRisky: true,
+    )
+    // Project overrides on @Symfony:risky defaults:
+    //   - keep declare(strict_types=1) in every file (Symfony omits them; we want them).
+    //   - keep snake_case test method names (Symfony uses camelCase; ours read as specs).
+    ->withConfiguredRule(DeclareStrictTypesFixer::class, ['strategy' => 'enforce'])
+    ->withConfiguredRule(PhpUnitMethodCasingFixer::class, ['case' => 'snake_case'])
     ->withSkip([
         __DIR__ . '/config/',
-        __DIR__ . '/migrations/',
         __DIR__ . '/public/',
-        __DIR__ . '/tests/Support/_generated',
         __DIR__ . '/tests/bootstrap.php',
-        __DIR__ . '/tests/Support/AcceptanceTester.php',
-        __DIR__ . '/tests/Support/FunctionalTester.php',
-        __DIR__ . '/tests/Support/UnitTester.php',
         __DIR__ . '/src/Kernel.php',
         __DIR__ . '/ecs.php',
         __DIR__ . '/rector.php',

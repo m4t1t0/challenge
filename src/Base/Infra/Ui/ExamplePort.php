@@ -13,19 +13,21 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route(path: '/api/example', methods: Request::METHOD_GET,)]
+#[Route(path: '/api/example', methods: Request::METHOD_GET, )]
 #[AsController]
 final readonly class ExamplePort
 {
     public function __construct(
         private CommandBusInterface $commandBus,
         private QueryBusInterface $queryBus,
-    ) {}
+    ) {
+    }
 
     public function __invoke(): JsonResponse
     {
         $this->commandBus->handle(new ExampleCommand());
         $message = $this->queryBus->ask(new ExampleQuery())->getResult();
+
         return new JsonResponse(
             [
                 'status' => 'success',

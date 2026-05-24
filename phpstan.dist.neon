@@ -1,0 +1,10 @@
+parameters:
+    level: max
+    paths:
+        - src
+        - tests
+    strictRules:
+        allRules: false
+    editorUrl: 'phpstorm://open?file=%%relFile%%line=%%line%%'
+    editorUrlTitle: '%%file%%:%%line%%'
+    treatPhpDocTypesAsCertain: false

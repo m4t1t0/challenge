@@ -9,4 +9,6 @@ use App\Shared\Application\Command\CommandInterface;
 /**
  * @see ExampleCommandHandler
  */
-final readonly class ExampleCommand implements CommandInterface {}
+final readonly class ExampleCommand implements CommandInterface
+{
+}

@@ -14,7 +14,8 @@ final readonly class SymfonyCommandBus implements CommandBusInterface
 {
     public function __construct(
         private MessageBusInterface $bus,
-    ) {}
+    ) {
+    }
 
     /**
      * @throws ExceptionInterface

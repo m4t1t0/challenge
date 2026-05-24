@@ -17,6 +17,5 @@
 ###< phpunit/phpunit ###
 
 ###> phpstan/phpstan ###
-phpstan.dist.neon
-phpstan-ignore.neon
+/phpstan.neon
 ###< phpstan/phpstan ###

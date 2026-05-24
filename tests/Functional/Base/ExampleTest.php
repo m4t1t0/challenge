@@ -20,14 +20,15 @@ final class ExampleTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('content-type', 'application/json');
-
-        $payload = json_decode(
+        $this->assertJsonStringEqualsJsonString(
+            json_encode(
+                [
+                    'status' => 'success',
+                    'message' => 'Query executed successfully',
+                ],
+                \JSON_THROW_ON_ERROR,
+            ),
             (string) $client->getResponse()->getContent(),
-            associative: true,
-            flags: JSON_THROW_ON_ERROR,
         );
-
-        $this->assertSame('success', $payload['status']);
-        $this->assertSame('Query executed successfully', $payload['message']);
     }
 }

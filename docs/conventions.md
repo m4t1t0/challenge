@@ -55,18 +55,36 @@ upstream rule changes.
 
 Automated refactoring. Active prepared sets (see `rector.php`):
 
-`deadCode`, `codeQuality`, `codingStyle`, `typeDeclarations`, `privatization`,
-`instanceOf`, `earlyReturn`, `rectorPreset`, `phpunitCodeQuality`,
-`doctrineCodeQuality`, `symfonyCodeQuality`, `symfonyConfigs`.
+`deadCode`, `codeQuality`, `codingStyle`, `typeDeclarations`,
+`typeDeclarationDocblocks`, `privatization`, `instanceOf`, `earlyReturn`,
+`rectorPreset`, `phpunitCodeQuality`, `doctrineCodeQuality`,
+`symfonyCodeQuality`, `symfonyConfigs`.
 
 Plus `withPhpSets()`, `withAttributesSets()`, and
 `withComposerBased(doctrine: true, phpunit: true, symfony: true)` so version
 upgrades automatically pull in the matching modernization rules.
 
+The `naming` set is **intentionally disabled** — its
+`RenameParamToMatchTypeRector` / `RenamePropertyToMatchTypeRector` rules
+mechanically rename identifiers from their type, which on this codebase fights
+Symfony idioms (e.g. `$client = self::createClient()` would become
+`$kernelBrowser`) and adds redundant prefixes inside already-typed classes.
+
 ### ECS (Easy Coding Standard) — `make ecs` / `make ecs-fix`
 
-Style rules sourced from `mikelgoig/easy-coding-standard-rules`. List active
-checkers with `make ecs-list`.
+Style rules sourced from PHP-CS-Fixer's **`@Symfony`** + **`@Symfony:risky`**
+sets — the same style the `symfony/symfony` repo uses. Two project-specific
+overrides (see `ecs.php`):
+
+- `DeclareStrictTypesFixer` is forced to `strategy: enforce` so every file
+  carries `declare(strict_types=1);`. `@Symfony:risky` would remove these
+  because the framework itself does not use them; we keep them as a modern
+  defensive default.
+- `PhpUnitMethodCasingFixer` is forced to `case: snake_case` for test method
+  names so they read as spec sentences (`test_from_string`) alongside the
+  `#[Test]` attribute.
+
+List active checkers with `make ecs-list`.
 
 ## Test strategy
 

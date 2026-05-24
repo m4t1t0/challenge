@@ -8,6 +8,7 @@ use App\Base\Application\Example\Command\ExampleCommand as ApplicationExampleCom
 use App\Base\Application\Example\Query\ExampleQuery;
 use App\Shared\Application\Bus\CommandBusInterface;
 use App\Shared\Application\Bus\QueryBusInterface;
+use Assert\Assertion;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -37,6 +38,7 @@ final class ExampleCommand extends Command
         $this->commandBus->handle(new ApplicationExampleCommand());
 
         $message = $this->queryBus->ask(new ExampleQuery())->getResult();
+        Assertion::string($message);
 
         $output->writeln('This is an example command.');
         $output->writeln($message);

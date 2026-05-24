@@ -11,7 +11,8 @@ final readonly class ExampleCommandHandler implements CommandHandlerInterface
 {
     public function __construct(
         private LoggerInterface $logger,
-    ) {}
+    ) {
+    }
 
     public function handle(ExampleCommand $command): void
     {

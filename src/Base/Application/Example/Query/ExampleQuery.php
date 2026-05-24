@@ -9,4 +9,6 @@ use App\Shared\Application\Query\QueryInterface;
 /**
  * @see ExampleQueryHandler
  */
-final class ExampleQuery implements QueryInterface {}
+final class ExampleQuery implements QueryInterface
+{
+}
