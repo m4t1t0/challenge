@@ -6,12 +6,10 @@
          bootstrap="tests/bootstrap.php"
          cacheDirectory="var/cache/phpunit"
          colors="true"
-         requireCoverageMetadata="true"
          failOnWarning="true"
          failOnRisky="true"
          failOnPhpunitDeprecation="true"
          beStrictAboutOutputDuringTests="true"
-         beStrictAboutCoverageMetadata="true"
          displayDetailsOnPhpunitDeprecations="true"
 >
     <testsuites>

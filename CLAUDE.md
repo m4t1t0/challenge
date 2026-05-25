@@ -12,6 +12,7 @@ business features one bounded context at a time.
 - **Symfony Messenger** as the CQRS bus (sync, single bus)
 - **Mercure** as a Caddy module for real-time, **Vulcain** for HTTP/2 push
 - **PHPUnit 12** for both unit tests and functional HTTP tests (Symfony `WebTestCase`)
+- **Infection** for mutation testing (runs in a dedicated non-ZTS test container)
 - **PHPStan**, **Rector**, **ECS** for static analysis and style
 
 ## Read next
@@ -33,6 +34,7 @@ make composer-update    # update dependencies
 make lint               # PHPStan + Rector + ECS
 make lint-fix           # apply Rector + ECS fixes
 make test               # unit + functional tests
+make infection          # mutation testing
 ```
 
 Full list: `make` (no target) prints the help banner.

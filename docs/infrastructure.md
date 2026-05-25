@@ -32,6 +32,11 @@ PHP extensions installed in the image: `apcu`, `intl`, `opcache`, `zip`, plus
   `FRANKENPHP_WORKER_CONFIG: watch` (auto-reload on source change) and
   `FRANKENPHP_SITE_CONFIG: hot_reload` (per-site reload). Source is bind-mounted
   at `/app`.
+- **`php_test`** — separate non-ZTS image (based on `php:8.5-cli`) used by the
+  `php-test` compose service. PHPUnit and Infection run here; the FrankenPHP
+  container can't because both PHP coverage drivers (Xdebug and pcov) are
+  unreliable on the ZTS build FrankenPHP requires. Bind-mounts the same `/app`
+  as the runtime, so `vendor/` is shared.
 - **`frankenphp_prod_builder`** — runs `composer install --no-dev` and dumps the
   optimized autoloader and prod env.
 - **`frankenphp_prod`** — minimal `debian:13-slim` runtime; only the FrankenPHP
@@ -104,9 +109,10 @@ container.
 | `make composer-validate`  | Strict validation of `composer.json`                         |
 | `make lint`               | PHPStan + Rector (dry-run) + ECS                             |
 | `make lint-fix`           | Rector + ECS in fix mode                                     |
-| `make test`               | Run both unit and functional suites (`TEST_FILTER=` supported) |
-| `make unit-test`          | Only the `unit` suite (`tests/Unit/`)                        |
-| `make func-test`          | Only the `functional` suite (`tests/Functional/`, accepts `TEST_FILTER=`) |
+| `make test`               | Run both unit and functional suites in `php-test` (`TEST_FILTER=` supported) |
+| `make unit-test`          | Only the `unit` suite (`tests/Unit/`) in `php-test`          |
+| `make func-test`          | Only the `functional` suite in `php-test` (accepts `TEST_FILTER=`) |
+| `make infection`          | Mutation testing in `php-test`                               |
 
 ## Local URLs
 

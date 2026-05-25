@@ -5,6 +5,7 @@ COLOR_HELP = \033[1;34m
 COLOR_BOLD = \033[1m
 
 CONTAINER_APP_NAME = php
+CONTAINER_TEST_NAME = php-test
 
 PROJECT_NAME = Challenge
 PROJECT_DESCRIPTION = Challenge
@@ -108,13 +109,17 @@ TEST_FILTER :=
 
 .PHONY: test
 test: ## Execute all tests
-	docker compose exec $(CONTAINER_APP_NAME) php vendor/bin/phpunit --testdox $(TEST_FILTER)
+	docker compose exec $(CONTAINER_TEST_NAME) vendor/bin/phpunit --testdox $(TEST_FILTER)
 
 .PHONY: unit-test
 unit-test: ## Execute unit tests
-	docker compose exec $(CONTAINER_APP_NAME) php vendor/bin/phpunit --testsuite=unit --testdox $(TEST_FILTER)
+	docker compose exec $(CONTAINER_TEST_NAME) vendor/bin/phpunit --testsuite=unit --testdox $(TEST_FILTER)
 
 .PHONY: func-test
 func-test: ## Execute functional tests
-	docker compose exec $(CONTAINER_APP_NAME) php vendor/bin/phpunit --testsuite=functional --testdox $(TEST_FILTER)
+	docker compose exec $(CONTAINER_TEST_NAME) vendor/bin/phpunit --testsuite=functional --testdox $(TEST_FILTER)
+
+.PHONY: infection
+infection: ## Run Infection mutation testing
+	docker compose exec $(CONTAINER_TEST_NAME) vendor/bin/infection --threads=max --no-progress
 

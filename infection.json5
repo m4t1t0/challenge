@@ -1,0 +1,18 @@
+{
+    "$schema": "vendor/infection/infection/resources/schema.json",
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "timeout": 10,
+    "logs": {
+        "text": "var/log/infection.log",
+        "summary": "var/log/infection-summary.log"
+    },
+    // Thresholds are intentionally loose for the empty starter — current
+    // baseline is 50% MSI / 50% Covered MSI on two example tests. Tighten
+    // these once real challenge code lands and the test suite grows.
+    "minMsi": 40,
+    "minCoveredMsi": 40
+}

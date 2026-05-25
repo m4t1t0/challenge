@@ -119,6 +119,24 @@ make func-test                              # only tests/Functional
 make func-test TEST_FILTER='--filter ExampleTest'
 ```
 
+PHPUnit (and Infection below) run in a **dedicated `php-test` container** on
+non-ZTS PHP. The FrankenPHP runtime container is ZTS-only, and both PHP
+coverage drivers (Xdebug and pcov) are unreliable on the ZTS build — Xdebug
+silently records zero hits, pcov segfaults during collection. The split keeps
+runtime fast and tests honest. See `docs/infrastructure.md` for the container
+layout.
+
+### Mutation testing — `make infection`
+
+`infection/infection` runs the full PHPUnit suite against systematically
+mutated copies of `src/`. A surviving mutant means a code path is not
+properly verified by the tests.
+
+Configured in `infection.json5`. Thresholds are **intentionally loose** for
+the empty starter — `minMsi: 40` / `minCoveredMsi: 40` (current baseline is
+50% / 50% on the two example tests). Tighten these once real challenge code
+lands and the suite grows.
+
 ## Composer
 
 - `composer.json` pins Symfony to `8.0.*` and uses the `extra.symfony.require`

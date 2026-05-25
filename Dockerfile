@@ -66,6 +66,35 @@ COPY --link frankenphp/conf.d/20-app.dev.ini $PHP_INI_DIR/app.conf.d/
 
 CMD [ "frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile", "--watch" ]
 
+# Test runner image. Uses non-ZTS PHP because PHP coverage extensions
+# (Xdebug coverage, pcov) are unreliable on the ZTS build that FrankenPHP
+# requires. PHPUnit and Infection run here; the FrankenPHP container is
+# the runtime, this is the verifier.
+FROM php:8.5-cli AS php_test
+
+ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+		git \
+		unzip \
+	&& rm -rf /var/lib/apt/lists/* \
+	&& install-php-extensions \
+		@composer \
+		intl \
+		opcache \
+		xdebug \
+		zip \
+	;
+
+ENV COMPOSER_ALLOW_SUPERUSER=1
+ENV APP_ENV=test
+# Auto-enable Xdebug coverage so PHPUnit/Infection don't need to set it per-run.
+ENV XDEBUG_MODE=coverage
+
+WORKDIR /app
+
+CMD ["sleep", "infinity"]
+
 # Prod FrankenPHP image
 FROM frankenphp_base AS frankenphp_prod
 

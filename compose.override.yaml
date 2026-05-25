@@ -23,5 +23,18 @@ services:
       # Ensure that host.docker.internal is correctly defined on Linux
       - host.docker.internal:host-gateway
     tty: true
+
+  # Dedicated test runner on non-ZTS PHP (PHPUnit + Infection need a working
+  # coverage driver, which is unreliable on the ZTS build FrankenPHP requires).
+  # Shares the same /app bind-mount and vendor/ as the runtime container.
+  php-test:
+    image: ${IMAGES_PREFIX:-}app-php-test
+    build:
+      context: .
+      target: php_test
+    volumes:
+      - ./:/app
+    environment:
+      APP_ENV: test
 ###> symfony/mercure-bundle ###
 ###< symfony/mercure-bundle ###
