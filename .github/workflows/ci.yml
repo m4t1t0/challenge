@@ -49,6 +49,15 @@ jobs:
         name: Check Mercure reachability
         run: curl -vkI --fail-with-body https://localhost/.well-known/mercure?topic=test
       -
+        name: PHPStan
+        run: docker compose exec -T php vendor/bin/phpstan analyse -c phpstan.dist.neon --memory-limit=-1
+      -
+        name: ECS (coding standard)
+        run: docker compose exec -T php vendor/bin/ecs check --memory-limit=-1
+      -
+        name: Rector (dry-run)
+        run: docker compose exec -T php vendor/bin/rector process --dry-run
+      -
         name: Create test database
         if: false # Remove this line if Doctrine ORM is installed
         run: docker compose exec -T php bin/console -e test doctrine:database:create
@@ -58,8 +67,7 @@ jobs:
         run: docker compose exec -T php bin/console -e test doctrine:migrations:migrate --no-interaction
       -
         name: Run PHPUnit
-        if: false # Remove this line if PHPUnit is installed
-        run: docker compose exec -T php bin/phpunit
+        run: docker compose exec -T php-test vendor/bin/phpunit
       -
         name: Doctrine Schema Validator
         if: false # Remove this line if Doctrine ORM is installed
