@@ -25,6 +25,6 @@ final class ExampleTest extends TestCase
     #[DataProvider('providerDescription')]
     public function test_from_string(string $value): void
     {
-        $this->assertSame('One', $value);
+        self::assertSame('One', $value);
     }
 }

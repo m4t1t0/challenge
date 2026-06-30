@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use PhpCsFixer\Fixer\PhpUnit\PhpUnitMethodCasingFixer;
+use PhpCsFixer\Fixer\PhpUnit\PhpUnitTestCaseStaticMethodCallsFixer;
 use PhpCsFixer\Fixer\Strict\DeclareStrictTypesFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
 
@@ -24,6 +25,9 @@ return ECSConfig::configure()
     //   - keep snake_case test method names (Symfony uses camelCase; ours read as specs).
     ->withConfiguredRule(DeclareStrictTypesFixer::class, ['strategy' => 'enforce'])
     ->withConfiguredRule(PhpUnitMethodCasingFixer::class, ['case' => 'snake_case'])
+    // Call PHPUnit's static assertions statically (self::) — required by
+    // phpstan-strict-rules (no dynamic calls to static methods).
+    ->withConfiguredRule(PhpUnitTestCaseStaticMethodCallsFixer::class, ['call_type' => 'self'])
     ->withSkip([
         __DIR__ . '/config/',
         __DIR__ . '/public/',

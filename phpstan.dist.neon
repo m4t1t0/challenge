@@ -4,7 +4,7 @@ parameters:
         - src
         - tests
     strictRules:
-        allRules: false
+        allRules: true
     editorUrl: 'phpstorm://open?file=%%relFile%%line=%%line%%'
     editorUrlTitle: '%%file%%:%%line%%'
     treatPhpDocTypesAsCertain: false

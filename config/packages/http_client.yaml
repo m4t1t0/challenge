@@ -1,0 +1,17 @@
+framework:
+    http_client:
+        # Define a scoped client per external dependency. A scoped client
+        # autowires by its camelCased name (e.g. `HttpClientInterface $myProvider`)
+        # and is the place to put per-dependency timeouts and retry policy.
+        #scoped_clients:
+            # Example: a resilient client for an external feed — bounded timeouts
+            # plus retry of transient failures with backoff + jitter.
+            #my_provider:
+            #    base_uri: '%env(MY_PROVIDER_URL)%'
+            #    timeout: 5
+            #    max_duration: 10
+            #    retry_failed:
+            #        max_retries: 3
+            #        delay: 500
+            #        multiplier: 2
+            #        jitter: 0.3

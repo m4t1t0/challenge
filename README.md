@@ -6,6 +6,10 @@ one example bounded context (`Base`) with one command, one query, one HTTP
 port, and one CLI port — to show the shape and conventions without imposing a
 business domain.
 
+It ships batteries-included: **PostgreSQL 18** (Doctrine DBAL + Migrations),
+**Redis 7** (application cache + lock store), a JSON exception envelope, and a
+strict static-analysis + mutation-testing pipeline.
+
 Based on [`dunglas/symfony-docker`](https://github.com/dunglas/symfony-docker).
 
 ## Getting started
@@ -33,7 +37,8 @@ docker compose exec php ./bin/console app:example
 
 ```console
 make lint        # PHPStan + Rector + ECS
-make test        # PHPUnit (unit + functional)
+make test        # PHPUnit (unit + functional); provisions the test DB
+make migrate     # apply Doctrine migrations
 make bash        # shell inside the php container
 ```
 
@@ -42,9 +47,11 @@ Run `make` with no target for the full help banner.
 ## Documentation
 
 - **[`CLAUDE.md`](CLAUDE.md)** — stack summary, quick commands, where the code lives.
+- **[`CONTEXT.md`](CONTEXT.md)** — template for the ubiquitous language of each bounded context.
 - **[`docs/architecture.md`](docs/architecture.md)** — modules, layers, the CQRS bus, worked request flow.
 - **[`docs/conventions.md`](docs/conventions.md)** — code style, static analysis stack, test strategy.
 - **[`docs/infrastructure.md`](docs/infrastructure.md)** — Docker stack, Caddyfile, env vars, full Makefile reference.
+- **[`docs/adr/`](docs/adr/README.md)** — architecture decision records + a template for new ones.
 
 ## License
 

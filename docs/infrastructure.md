@@ -16,9 +16,12 @@ this document describes the project-specific choices on top of it.
 | Vulcain         | Caddy module for HTTP/2 Server Push-based hypermedia                           |
 | Symfony         | **8.0**                                                                        |
 | Messenger bus   | sync, single bus (`messenger.bus.default`); no transport configured yet        |
+| PostgreSQL      | **18** (`postgres:18-alpine`), reached over DBAL; data in the `database_data` volume |
+| Redis           | **7** (`redis:7-alpine`), backs the application cache (`cache.app`) and the lock store |
+| Doctrine        | DBAL + Migrations (ORM installed but `auto_mapping` off — see `config/packages/doctrine.yaml`) |
 
-PHP extensions installed in the image: `apcu`, `intl`, `opcache`, `zip`, plus
-`xdebug` in the dev target only.
+PHP extensions installed in the image: `apcu`, `intl`, `opcache`, `redis`,
+`zip`, plus `pdo_pgsql` (Doctrine), and `xdebug` in the dev/test targets only.
 
 ## Container layout
 
@@ -69,8 +72,8 @@ old `MERCURE_TRANSPORT_URL` env var is gone).
 
 | File                    | Purpose                                                                    |
 | ----------------------- | -------------------------------------------------------------------------- |
-| `compose.yaml`          | Base service definition: image, ports (80/443 TCP + 443 UDP for HTTP/3), volumes for Caddy data/config, Mercure env keys |
-| `compose.override.yaml` | Dev-only overrides: target `frankenphp_dev`, source bind-mount, Xdebug env, `FRANKENPHP_WORKER_CONFIG: watch`, `FRANKENPHP_SITE_CONFIG: hot_reload`, `MERCURE_EXTRA_DIRECTIVES: demo` |
+| `compose.yaml`          | Base service definition: `php`, `database` (Postgres), `redis`; ports (80/443 TCP + 443 UDP for HTTP/3), volumes for Caddy data/config + `database_data` + `redis_data`, Mercure env keys. `php` waits for `database` and `redis` to be healthy. |
+| `compose.override.yaml` | Dev-only overrides: target `frankenphp_dev`, source bind-mount, Xdebug env, `FRANKENPHP_WORKER_CONFIG: watch`, `FRANKENPHP_SITE_CONFIG: hot_reload`, `MERCURE_EXTRA_DIRECTIVES: demo`; wires `php-test` to the `database` service (test DB gets a `_test` suffix) and exposes Postgres on an ephemeral host port |
 | `compose.prod.yaml`     | Prod target build, locked JWT secrets, no source bind-mount                |
 
 ## Environment variables of note
@@ -90,6 +93,10 @@ Driven by Caddy / FrankenPHP; defined in compose files or `.env`:
 | `MERCURE_EXTRA_DIRECTIVES`     | `demo` (dev only)                                | Extra Caddyfile directives inside `mercure { … }`    |
 | `XDEBUG_MODE`                  | `off`                                            | Switch Xdebug on with `develop`, `debug`, `profile`, … |
 | `APP_ENV`                      | `dev` (override), `prod` (in prod compose)       | Symfony environment                                  |
+| `DATABASE_URL`                 | `postgresql://app:!ChangeMe!@database:5432/app?serverVersion=18` | Doctrine DBAL connection                |
+| `REDIS_URL`                    | `redis://redis:6379`                             | Application cache + lock backend                     |
+| `LOCK_DSN`                     | `${DATABASE_URL}`                                | Symfony Lock store (Postgres advisory lock by default) |
+| `POSTGRES_DB` / `_USER` / `_PASSWORD` | `app` / `app` / `!ChangeMe!`              | Postgres bootstrap credentials                       |
 
 ## Daily workflow (Makefile shortcuts)
 
@@ -99,7 +106,7 @@ container.
 | Command                   | Description                                                  |
 | ------------------------- | ------------------------------------------------------------ |
 | `make build`              | Rebuild images from scratch (`--no-cache`)                   |
-| `make start`              | `docker compose up --pull always -d --wait`                  |
+| `make start`              | `docker compose up -d --wait` (brings up `php`, `database`, `redis`) |
 | `make down`               | Stop and remove orphans                                      |
 | `make bash`               | Shell inside the `php` container                             |
 | `make cache-clear`        | `bin/console cache:clear`                                    |
@@ -107,9 +114,11 @@ container.
 | `make composer-install`   | Install dependencies                                         |
 | `make composer-update`    | Update dependencies                                          |
 | `make composer-validate`  | Strict validation of `composer.json`                         |
+| `make migrate`            | Apply Doctrine migrations (`doctrine:migrations:migrate`)    |
+| `make migration`          | Generate a migration from mapping diff (`doctrine:migrations:diff`) |
 | `make lint`               | PHPStan + Rector (dry-run) + ECS                             |
 | `make lint-fix`           | Rector + ECS in fix mode                                     |
-| `make test`               | Run both unit and functional suites in `php-test` (`TEST_FILTER=` supported) |
+| `make test`               | Run both suites in `php-test`; first clears the test cache and provisions/migrates the `app_test` DB (`TEST_FILTER=` supported) |
 | `make unit-test`          | Only the `unit` suite (`tests/Unit/`) in `php-test`          |
 | `make func-test`          | Only the `functional` suite in `php-test` (accepts `TEST_FILTER=`) |
 | `make infection`          | Mutation testing in `php-test`                               |

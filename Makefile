@@ -31,7 +31,7 @@ build: ## Initialize this project
 
 .PHONY: start
 start: ## Start this project
-	docker compose up --pull always -d --wait
+	docker compose up -d --wait
 
 .PHONY: down
 down: ## Stop this project
@@ -62,6 +62,16 @@ composer-update: ## Update Composer dependencies
 .PHONY: composer-validate
 composer-validate: ## Validate composer.json and composer.lock
 	docker compose exec -e "COMPOSER_MEMORY_LIMIT=-1" $(CONTAINER_APP_NAME) composer validate --no-check-lock --strict composer.json
+
+##@ Database
+
+.PHONY: migrate
+migrate: ## Run database migrations
+	docker compose exec $(CONTAINER_APP_NAME) ./bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
+
+.PHONY: migration
+migration: ## Generate a migration from mapping changes (diff)
+	docker compose exec $(CONTAINER_APP_NAME) ./bin/console doctrine:migrations:diff
 
 ##@ Code analysis
 
@@ -107,19 +117,33 @@ rector-fix: ## Run Rector and fix errors
 
 TEST_FILTER :=
 
+# Drop the compiled test container first so tests always reflect current code.
+# PHPUnit runs with APP_DEBUG=0 (phpunit.xml.dist), which skips the kernel's
+# freshness check — a stale container cache would otherwise survive code changes.
+.PHONY: test-cache-clear
+test-cache-clear:
+	@docker compose exec -T $(CONTAINER_TEST_NAME) rm -rf var/cache/test
+
+# Ensure the test database (app_test) exists and is migrated. Idempotent, so it
+# is safe to run before every DB-touching suite (CI and a fresh local checkout).
+.PHONY: test-prepare
+test-prepare:
+	@docker compose exec -T $(CONTAINER_TEST_NAME) php bin/console doctrine:database:create --if-not-exists
+	@docker compose exec -T $(CONTAINER_TEST_NAME) php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
+
 .PHONY: test
-test: ## Execute all tests
+test: test-cache-clear test-prepare ## Execute all tests
 	docker compose exec $(CONTAINER_TEST_NAME) vendor/bin/phpunit --testdox $(TEST_FILTER)
 
 .PHONY: unit-test
-unit-test: ## Execute unit tests
+unit-test: test-cache-clear ## Execute unit tests
 	docker compose exec $(CONTAINER_TEST_NAME) vendor/bin/phpunit --testsuite=unit --testdox $(TEST_FILTER)
 
 .PHONY: func-test
-func-test: ## Execute functional tests
+func-test: test-cache-clear test-prepare ## Execute functional tests
 	docker compose exec $(CONTAINER_TEST_NAME) vendor/bin/phpunit --testsuite=functional --testdox $(TEST_FILTER)
 
 .PHONY: infection
-infection: ## Run Infection mutation testing
+infection: test-cache-clear test-prepare ## Run Infection mutation testing
 	docker compose exec $(CONTAINER_TEST_NAME) vendor/bin/infection --threads=max --no-progress
 

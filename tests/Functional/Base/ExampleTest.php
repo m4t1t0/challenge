@@ -16,9 +16,9 @@ final class ExampleTest extends WebTestCase
         $client = self::createClient();
         $client->request(Request::METHOD_GET, '/api/example');
 
-        $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/json');
-        $this->assertJsonStringEqualsJsonString(
+        self::assertResponseIsSuccessful();
+        self::assertResponseHeaderSame('content-type', 'application/json');
+        self::assertJsonStringEqualsJsonString(
             json_encode(
                 [
                     'status' => 'success',

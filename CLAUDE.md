@@ -10,10 +10,12 @@ business features one bounded context at a time.
 - **Symfony 8.0** — `framework-bundle`, `console`, `runtime`, `messenger`,
   `dotenv`, `yaml`
 - **Symfony Messenger** as the CQRS bus (sync, single bus)
+- **PostgreSQL 18** via **Doctrine DBAL + Migrations** (ORM installed, `auto_mapping` off)
+- **Redis 7** backing the application cache and the **Symfony Lock** store
 - **Mercure** as a Caddy module for real-time, **Vulcain** for HTTP/2 push
 - **PHPUnit 12** for both unit tests and functional HTTP tests (Symfony `WebTestCase`)
 - **Infection** for mutation testing (runs in a dedicated non-ZTS test container)
-- **PHPStan**, **Rector**, **ECS** for static analysis and style
+- **PHPStan** (max level, strict-rules `allRules`), **Rector**, **ECS** for static analysis and style
 
 ## Read next
 
@@ -22,6 +24,8 @@ business features one bounded context at a time.
 | Module layout, CQRS bus, request flow       | [`docs/architecture.md`](docs/architecture.md) |
 | Code style, naming, static analysis, tests  | [`docs/conventions.md`](docs/conventions.md)   |
 | Docker stack, Caddyfile, Makefile, env vars | [`docs/infrastructure.md`](docs/infrastructure.md) |
+| Ubiquitous language per bounded context     | [`CONTEXT.md`](CONTEXT.md) (template)          |
+| Architecture decisions + ADR template       | [`docs/adr/`](docs/adr/README.md)              |
 
 ## Quick commands
 
@@ -31,9 +35,10 @@ All commands run inside the `php` container via the project Makefile.
 make start              # boot the dev stack (https://localhost)
 make bash               # shell into the container
 make composer-update    # update dependencies
+make migrate            # apply Doctrine migrations
 make lint               # PHPStan + Rector + ECS
 make lint-fix           # apply Rector + ECS fixes
-make test               # unit + functional tests
+make test               # unit + functional tests (provisions the test DB)
 make infection          # mutation testing
 ```
 
@@ -52,6 +57,6 @@ Full list: `make` (no target) prints the help banner.
 ## Conventions in one line
 
 `declare(strict_types=1)` everywhere · `final readonly` for handlers, ports and
-adapters · marker interfaces (`CommandInterface`, `QueryInterface`) auto-tag
-handlers as Messenger handlers via `_instanceof` in `config/services.yaml`,
+adapters · marker interfaces (`CommandHandlerInterface`, `QueryHandlerInterface`)
+auto-tag handlers as Messenger handlers via `instanceof` in `config/services.php`,
 so adding a feature is **zero-config**.

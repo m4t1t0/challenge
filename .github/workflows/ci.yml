@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   tests:
-    name: Tests
+    name: Lint & Test
     runs-on: ubuntu-latest
     steps:
       -
@@ -39,40 +39,18 @@ jobs:
         name: Start services
         run: docker compose up --wait --no-build
       -
-        name: Check HTTP reachability
-        run: curl -v --fail-with-body http://localhost
+        name: Smoke-check the app boots (example endpoint)
+        run: curl -fsSk https://localhost/api/example
       -
-        name: Check HTTPS reachability
-        if: false # Remove this line when the homepage will be configured, or change the path to check
-        run: curl -vk --fail-with-body https://localhost
+        name: Lint (PHPStan + Rector + ECS)
+        run: make lint
       -
-        name: Check Mercure reachability
-        run: curl -vkI --fail-with-body https://localhost/.well-known/mercure?topic=test
+        name: Test (unit + functional; provisions the test DB)
+        run: make test
       -
-        name: PHPStan
-        run: docker compose exec -T php vendor/bin/phpstan analyse -c phpstan.dist.neon --memory-limit=-1
-      -
-        name: ECS (coding standard)
-        run: docker compose exec -T php vendor/bin/ecs check --memory-limit=-1
-      -
-        name: Rector (dry-run)
-        run: docker compose exec -T php vendor/bin/rector process --dry-run
-      -
-        name: Create test database
-        if: false # Remove this line if Doctrine ORM is installed
-        run: docker compose exec -T php bin/console -e test doctrine:database:create
-      -
-        name: Run migrations
-        if: false # Remove this line if Doctrine Migrations is installed
-        run: docker compose exec -T php bin/console -e test doctrine:migrations:migrate --no-interaction
-      -
-        name: Run PHPUnit
-        run: docker compose exec -T php-test vendor/bin/phpunit
-      -
-        name: Doctrine Schema Validator
-        if: false # Remove this line if Doctrine ORM is installed
-        run: docker compose exec -T php bin/console -e test doctrine:schema:validate
-  lint:
+        name: Mutation testing
+        run: make infection
+  docker-lint:
     name: Docker Lint
     runs-on: ubuntu-latest
     steps:

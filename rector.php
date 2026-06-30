@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -34,6 +35,9 @@ return RectorConfig::configure()
     )
     ->withRules([])
     ->withSkip([
+        // Conflicts with phpstan-strict-rules (no dynamic calls to static
+        // methods) and our ECS config: PHPUnit assertions are called statically.
+        PreferPHPUnitThisCallRector::class,
         __DIR__ . '/config/',
         __DIR__ . '/public/',
         __DIR__ . '/tests/bootstrap.php',
